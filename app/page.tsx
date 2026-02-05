@@ -2,8 +2,7 @@
 
 import LoadingScreen from "@/components/LoadingScreen";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import WorkingHard from "@/components/WorkingHard";
+import HeroTransition from "@/components/HeroTransition";
 import FeatureShowcase from "@/components/FeatureShowcase";
 import FeatureGrid from "@/components/FeatureGrid";
 import BuiltDifferent from "@/components/BuiltDifferent";
@@ -19,8 +18,7 @@ export default function Home() {
       <div className="relative">
         <Navbar />
         <main>
-          <Hero />
-          <WorkingHard />
+          <HeroTransition />
           <FeatureShowcase />
           <FeatureGrid />
           <BuiltDifferent />
