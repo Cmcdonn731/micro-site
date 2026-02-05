@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { gsap, useGSAP } from "@/lib/gsap";
 
 const marqueeWords = [
   "AI-Powered",
@@ -39,15 +39,88 @@ const features = [
 ];
 
 export default function FeatureGrid() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const screenshotRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (!sectionRef.current) return;
+
+      // Marquee labels fade in
+      const marqueeLabels = sectionRef.current.querySelectorAll(
+        "[data-marquee-label]"
+      );
+      gsap.from(marqueeLabels, {
+        y: 20,
+        opacity: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      // Heading reveal
+      if (headingRef.current) {
+        gsap.from(headingRef.current, {
+          y: 60,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Screenshot parallax
+      if (screenshotRef.current) {
+        gsap.fromTo(
+          screenshotRef.current,
+          { y: 60, scale: 0.95 },
+          {
+            y: -40,
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: screenshotRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          }
+        );
+      }
+
+      // Feature cards staggered reveal
+      if (cardsRef.current) {
+        const cards = cardsRef.current.querySelectorAll("[data-card]");
+        gsap.from(cards, {
+          y: 80,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+    },
+    { scope: sectionRef }
+  );
 
   return (
-    <section ref={ref} className="relative py-[100px]">
+    <section ref={sectionRef} className="relative py-[100px]">
       <div className="max-w-[1600px] mx-auto px-8">
         {/* Marquee header */}
         <div className="mb-16">
@@ -55,13 +128,17 @@ export default function FeatureGrid() {
             {marqueeWords.map((word) => (
               <span
                 key={word}
+                data-marquee-label
                 className="text-[var(--white1)] font-[family-name:var(--font-space-mono)] text-[8px] tracking-[0.96px] uppercase"
               >
                 {word}
               </span>
             ))}
           </div>
-          <h2 className="font-[family-name:var(--font-playfair)] text-[72px] leading-[100%] tracking-[-0.05em] text-[var(--white1)] text-center">
+          <h2
+            ref={headingRef}
+            className="font-[family-name:var(--font-playfair)] text-[72px] leading-[100%] tracking-[-0.05em] text-[var(--white1)] text-center"
+          >
             Micro works the way
             <br />
             you want to work
@@ -69,9 +146,9 @@ export default function FeatureGrid() {
         </div>
 
         {/* Product screenshot */}
-        <motion.div
-          className="relative max-w-full mx-auto mb-16"
-          style={{ y }}
+        <div
+          ref={screenshotRef}
+          className="relative max-w-full mx-auto mb-16 will-change-transform"
         >
           <div className="relative w-full max-w-[1100px] mx-auto aspect-[1268/694] rounded-[10px] overflow-hidden">
             <Image
@@ -79,21 +156,23 @@ export default function FeatureGrid() {
               alt="Micro application"
               fill
               className="object-cover"
+              sizes="100vw"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Feature cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {features.map((feature, i) => (
             <div
               key={feature.title}
-              className="relative rounded-[16px] overflow-hidden bg-[var(--black6)] border border-[var(--black3)]"
+              data-card
+              className="relative rounded-[16px] overflow-hidden bg-[var(--black6)] border border-[var(--black3)] group cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
             >
               {/* Card image area */}
               <div className="relative h-[200px] overflow-hidden">
                 <div
-                  className={`absolute inset-0 bg-gradient-to-b ${feature.gradient} opacity-30`}
+                  className={`absolute inset-0 bg-gradient-to-b ${feature.gradient} opacity-30 group-hover:opacity-40 transition-opacity`}
                 />
                 {i === 0 && (
                   <div className="absolute inset-8 flex items-center justify-center gap-4">

@@ -2,25 +2,114 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { gsap, useGSAP } from "@/lib/gsap";
 
 export default function WorkingHard() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const subheadingRef = useRef<HTMLHeadingElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const img1Ref = useRef<HTMLDivElement>(null);
+  const img2Ref = useRef<HTMLDivElement>(null);
 
-  const y1 = useTransform(scrollYProgress, [0, 1], [100, -100]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [50, -150]);
+  useGSAP(
+    () => {
+      if (!sectionRef.current) return;
+
+      // Heading reveal
+      if (headingRef.current) {
+        gsap.from(headingRef.current, {
+          y: 60,
+          opacity: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Subheading reveal with delay
+      if (subheadingRef.current) {
+        gsap.from(subheadingRef.current, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: subheadingRef.current,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Text paragraph reveal
+      if (textRef.current) {
+        const paragraphs = textRef.current.querySelectorAll("p");
+        gsap.from(paragraphs, {
+          y: 30,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: textRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+        });
+      }
+
+      // Floating images with parallax scroll
+      if (img1Ref.current) {
+        gsap.fromTo(
+          img1Ref.current,
+          { y: 100, opacity: 0 },
+          {
+            y: -100,
+            opacity: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          }
+        );
+      }
+
+      if (img2Ref.current) {
+        gsap.fromTo(
+          img2Ref.current,
+          { y: 50, opacity: 0 },
+          {
+            y: -150,
+            opacity: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          }
+        );
+      }
+    },
+    { scope: sectionRef }
+  );
 
   return (
-    <section ref={ref} className="relative py-[100px] overflow-hidden">
+    <section ref={sectionRef} className="relative py-[100px] overflow-hidden">
       <div className="max-w-[1600px] mx-auto px-8">
         {/* Floating images */}
-        <motion.div
-          className="absolute -top-[47px] right-[calc(100%-197px)] hidden lg:block"
-          style={{ y: y1 }}
+        <div
+          ref={img1Ref}
+          className="absolute -top-[47px] right-[calc(100%-197px)] hidden lg:block will-change-transform"
         >
           <Image
             src="/images/Calendar.png"
@@ -29,10 +118,10 @@ export default function WorkingHard() {
             height={240}
             className="rounded-[20px]"
           />
-        </motion.div>
-        <motion.div
-          className="absolute -top-[81px] left-[calc(100%-185px)] hidden lg:block"
-          style={{ y: y2 }}
+        </div>
+        <div
+          ref={img2Ref}
+          className="absolute -top-[81px] left-[calc(100%-185px)] hidden lg:block will-change-transform"
         >
           <Image
             src="/images/Email.png"
@@ -41,18 +130,27 @@ export default function WorkingHard() {
             height={240}
             className="rounded-[20px]"
           />
-        </motion.div>
+        </div>
 
         {/* Text content */}
         <div className="max-w-[653px] mx-auto text-center">
-          <h2 className="font-[family-name:var(--font-playfair)] text-[72px] leading-[100%] tracking-[-0.05em] text-[var(--white1)] mb-[46px]">
+          <h2
+            ref={headingRef}
+            className="font-[family-name:var(--font-playfair)] text-[72px] leading-[100%] tracking-[-0.05em] text-[var(--white1)] mb-[46px]"
+          >
             Working hard just got easy
           </h2>
-          <h3 className="text-[44px] leading-[52px] tracking-[-0.05em] text-[var(--white1)] mb-[66px]">
+          <h3
+            ref={subheadingRef}
+            className="text-[44px] leading-[52px] tracking-[-0.05em] text-[var(--white1)] mb-[66px]"
+          >
             The era of Brute Force Productivity™ is over and a new one has
             begun.
           </h3>
-          <div className="text-[19px] leading-[32px] tracking-[-0.05em] text-[var(--white1)] max-w-[503px] mx-auto text-left">
+          <div
+            ref={textRef}
+            className="text-[19px] leading-[32px] tracking-[-0.05em] text-[var(--white1)] max-w-[503px] mx-auto text-left"
+          >
             <p>
               Where everything is centralized - one place to catch up on all
               your <strong className="font-semibold">messages</strong>, check in
