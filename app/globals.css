@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #f9f5ee;
+  --black1: #0a0a0a;
+  --black2: #14151a;
+  --black3: #1c1d24;
+  --black5: #2a2b33;
+  --black6: #1a1b22;
+  --white1: #f9f5ee;
+  --white2: #f9f5ee;
+  --white4: #e5d8c4;
+  --white5: #3a3a3a;
+  --orange1: #eaa04e;
+  --orange3: #eaa04e;
+  --blue1: #188BD2;
+  --green1: #1edcb5;
+  --green4: #1edcb5;
+  --purple1: #8f7be3;
+  --teal: #00cfc4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-outfit);
+  --font-serif: var(--font-playfair);
+  --font-mono: var(--font-space-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-outfit), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Loading screen marquee */
+@keyframes marquee-scroll {
+  0% { translate: 0 -100%; opacity: 1; }
+  95% { opacity: 1; }
+  100% { opacity: 0; translate: 0 100%; }
+}
+
+@keyframes slide-up-exit {
+  0% { transform: translate(0, 0); }
+  30% { transform: translate(0, 1px); }
+  100% { transform: translate(0, -110vh); }
+}
+
+@keyframes slide-up-enter {
+  0% { translate: 0 111vh; }
+  30% { translate: 0 110vh; }
+  100% { translate: 0 0; }
+}
+
+@keyframes digit-flip {
+  from { translate: 0 0; }
+  to { translate: 0 calc(-100% + var(--digit-height, 13px)); }
+}
+
+@keyframes horizontal-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Dot grid background pattern */
+.dot-grid {
+  background-size: 18px 18px;
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    var(--white5) 0,
+    var(--white5) 1px,
+    transparent 1px
+  );
 }
